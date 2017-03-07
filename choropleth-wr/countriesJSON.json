@@ -1,0 +1,29 @@
+{
+	"albania": {
+		"category": [
+			{
+				"id": "legal abortion",
+				"rule1": true,
+				"rule2": true,
+				"rule3": true,
+				"rule4": true,
+				"rule5": true,
+				"rule6": true,
+				"rule7": true
+			},
+			{
+				"id": "sexual harrasment",
+				"rule1": true,
+				"rule2": true,
+				"rule3": true
+			},
+			{
+				"id": "work",
+				"rule1": false,
+				"rule2": true,
+				"rule3": true,
+				"rule4": true
+			}
+		]
+	}
+}

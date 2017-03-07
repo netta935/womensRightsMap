@@ -1,0 +1,340 @@
+<!doctype html>
+
+<html>
+	<head>
+		<title> choropleth women Rights </title>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+		<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+		<style>
+			#map {
+				width: 600px;
+				height: 400px;
+			}
+			
+		</style>
+		<style>	
+			h2{
+				font-family: Impact, Charcoal, sans-serif;
+			}
+			#controls{
+				padding: 20px 20px;
+				text-align: left;
+				font-size: 15px;
+				margin: 5px 0;
+				font-family: Impact, Charcoal, sans-serif;
+			}
+			p{
+				font-family: Tahoma, Geneva, sans-serif;	
+			}
+			#controls #scale-by{
+				margin-right: 6px;
+			}	
+			#controls #buttons {
+				display: inline-block;
+			}
+			#scale-by{
+				border: none;
+				font-size: 16px; display: inline-block; font-weight:bold;
+			}
+			
+			.btn {
+				border: none;
+				color: white;
+				padding: 10px 10px;
+				text-align: center;
+				display: inline-block;
+				font-size: 14px;
+				cursor: pointer;
+			}
+			
+			.abortion {background-color: #4CAF50; border-radius: 4px;} /* Green */
+			.abortion:hover {background-color: #46a049;}
+
+			.domestic {background-color: #2196F3; border-radius: 4px;} /* Blue */
+			.domestic:hover {background: #0b7dda;}
+
+			.sexual {background-color: #ff9800; border-radius: 4px;} /* Orange */
+			.sexual:hover {background: #e68a00;}
+
+			.constitution {background-color: #f44336; border-radius: 4px;} /* Red */ 
+			.constitution:hover {background: #da190b;}
+
+			.property {background-color: #88419d; border-radius: 4px; } /* Purple */ 
+			.property:hover {background: #6e016b;}
+			
+			.work {background-color: #555555; color: white; border-radius: 4px;} /* black */ 
+			.work:hover {background: #252525;}
+
+			.other {background-color: #008CBA; color: white; border-radius: 4px;} /* turkiz */ 
+			.other:hover {background: #ddd;}
+						
+						/*STYLE OF THE MAP*/
+			#map { 
+				width: 800px; 
+				height: 500px; 
+				margin-left: 150px;
+			}
+			
+			#info_menu{
+				padding: 20px; 
+
+			}
+			
+			.info { 
+				padding: 6px 8px;
+				font: 14px/16px Arial, Helvetica, sans-serif;
+				background: white; 
+				background: rgba(255,255,255,0.8); 
+				box-shadow: 0 0 15px rgba(0,0,0,0.2); 
+				border-radius: 5px; 
+			}
+			.info h4 {
+				margin: 0 0 5px;
+				color: #777; 
+			}
+			.legend {
+				text-align: left;
+				line-height: 18px;
+				color: #555;
+			} 
+			.legend i {
+				width: 18px;
+				height: 18px;
+				float: left;
+				margin-right: 8px;
+				opacity: 0.7;
+			}
+		</style>
+	</head>
+
+
+	<body>
+		<h2 style = "text-align:center; ">Women's rights in Europe</h2>
+		<p>This map presents data about legislation on women's rights matters across Europe. The data was taken from World Bank and UN.</br></p>
+		<p><span style= "font-size: 16:px; font-weight:900;">We invite you to explore:</span> Which countries legislate for gender equality? Which countries have laws preventing violence? Which countries have laws preventing violence?</br></p>
+		<p><span style = "font-weight:900; text-decoration: underline;"> Step 1</span>  - Select a category at the top, and hover over a country to see how it has legislated in each of the categories (violence, harassment, abortion, property, employment and constitutional rights).</br> 
+		<span style = "font-weight:900; text-decoration: underline;">Step 2</span> - Click on a country to check in specific – what rules this country has legislated in the selected category, and what rules it has not.</br>
+		</p>
+					<!--controls buttons -->
+			<div id="controls">
+				<span id="scale-by" style="word-spacing: 3px;">Explore a category:</span> 
+				<span id="buttons">
+					<button class="btn abortion" onclick=setupMap(europeAbortion)>Abortion</button>
+					<button class="btn domestic" onclick=setupMap(europeDomesticViolence)>Domestic violence</button>
+					<button class="btn sexual" onclick=setupMap(europeSexualHarassment)>Sexual harrasment</button>
+					<button class="btn constitution" onclick=setupMap(europeConstitution)>Constitution</button>
+					<button class="btn property" onclick=setupMap(europeProperty)>Property</button>
+					<button class="btn work" onclick=setupMap(europeWork)>Work</button>
+				</span>
+			</div>
+		<script>
+
+		</script>
+
+		
+		
+		<div id="wrapper" style= "width: 100%; display: table;">
+			<div style = "display: table-row">
+				<div id="map" style=" display: table-cell;" > </div>
+				<div id="info_menu" style= "display: table-cell;"></div>
+			</div>
+		</div>
+		
+		<script type="text/javascript" src="choropleth-wr\europeAbortion.js"></script>
+		<script type="text/javascript" src="choropleth-wr\europeSexual.js"></script>
+		<script type="text/javascript" src="choropleth-wr\europeDomesticViolence.js"></script>
+		<script type="text/javascript" src="choropleth-wr\europeConstitution.js"></script>
+		<script type="text/javascript" src="choropleth-wr\europeProperty.js"></script>
+		<script type="text/javascript" src="choropleth-wr\europeWork.js"></script>
+		
+		<script type="text/javascript">
+			var mapi;
+			var info;
+			var rightInfo;
+			var right_div = L.DomUtil.create('div', 'right_info');
+			
+
+			//function for the GeoJSON layer 
+			function style(feature) {
+				return {
+					weight: 2,
+					opacity: 1,
+					color: 'white',
+					dashArray: '3',
+					fillOpacity: 0.7,
+					fillColor: getColor(feature.properties.Score)//this function describing to color by country's score
+				};
+			}
+			
+			//to add the listeners on the countries layers
+			function onEachFeature(feature, layer) {
+				layer.on({
+					mouseover: highlightFeature,
+					mouseout: resetHighlight,
+					click: detailsRules
+					
+					
+				});
+			}
+
+			// get color depending on category score value
+			function getColor(d) {
+				return 	d == 'missing data' ? '#636363' :
+						d > 90  ? '#005a32' :
+						d > 75  ? '#238443' :
+						d > 60  ? '#41ab5d' :
+						d > 45   ? '#78c679' :
+						d > 30   ? '#addd8e' :
+						d > 15   ? '#d9f0a3' :
+									'#ffffcc';									
+			}
+				
+			var geojson;
+			
+			// listener01- make countries highlighted visually when they are hovered with a mouse.
+			function highlightFeature(e) {
+				var layer = e.target;
+
+				layer.setStyle({
+					weight: 2,// line width
+					color: '#666',// line color
+					dashArray: '',
+					fillOpacity: 0.7
+				});
+
+				if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+					layer.bringToFront();
+				}
+
+				info.update(layer.feature.properties);
+			}
+			
+			//listner 02 -what happans on mouseout
+			function resetHighlight(e) {//reset the layer style to its deafult country
+				geojson.resetStyle(e.target);
+				info.update();
+			}
+			
+			//listener 03 - what happans when click on country
+			function detailsRules(e){
+				var layer2 = e.target;
+				rightInfo.reset();
+				rightInfo.update(layer2.feature.properties);	
+			}
+
+			//setting up the map
+			function setNewMap(){
+			
+				var map = L.map('map').setView([57, 40], 3);
+				L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+					maxZoom: 18,
+					attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+						'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+						'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+					id: 'mapbox.light'
+				}).addTo(map);
+				
+
+				//##bottom legend control##//
+				var legend = L.control({position: 'bottomright'});
+
+				legend.onAdd = function (map) {
+
+					var div = L.DomUtil.create('div', 'info legend'),
+						grades = [ 0, 15, 30, 45, 60, 75, 90, 100],
+						labels = [],
+						from, to;
+					// loop through our score intervals and generate a label with
+					// a colored square for each interval
+					for (var i = 0; i < grades.length-1; i++) {
+						from = grades[i];
+						to = grades[i + 1];
+
+						labels.push(
+							'<i style="background:' + getColor(from + 1) + '"></i> ' +
+							from + (to ? '&ndash;' + to : '+'));
+					}
+					labels.push(
+							'<i style="background:#636363"></i> Missing Data');
+
+					div.innerHTML = labels.join('<br>');
+					return div;
+				};
+
+				legend.addTo(map);
+				return map;
+			}
+			mapi = setNewMap();
+			
+			//insert the map with category
+			function setupMap(issue_information){
+				mapi.remove()
+				mapi = setNewMap()
+				geojson = L.geoJson(issue_information, {
+									style: style,
+									onEachFeature: onEachFeature
+									})
+							.addTo(mapi);
+				
+
+				// Information controls//
+				//1- control that shows country info on hover	
+				info = L.control();
+
+				info.onAdd = function (map) {
+					this._div = L.DomUtil.create('div', 'info');// create a div with a clss "info"
+					this.update();
+					return this._div;
+				};
+				
+				info.update = function (props) {
+					this._div.innerHTML = '<h4>Europe Women Rights</h4>' +(props ?'<b>' + props.name + '</b><br />' + props.Score + '% in ' + props.category
+						: 'Hover over a country');
+						
+				};
+
+				info.addTo(mapi);
+				
+				//2- rightInfo(right of the map)
+				rightInfo = L.control({position:'bottomleft'});
+				
+				rightInfo.onAdd = function(map){
+					this._div = right_div;
+					this.reset()
+					this.update();
+					return this._div;
+				};
+				
+				rightInfo.reset = function(){
+					this._div.innerHTML = ""	
+				};
+				
+				rightInfo.update = function(props){
+					this._div.innerHTML = ""
+				
+					if (props) {
+							this._div.innerHTML = props.name + '<b><br/>' + props.category + '<b><br/><br/>'
+						for(i=0; i< props.rules.length; i++){
+							this._div.innerHTML += i+1 +'.&nbsp;'+ props.rules[i].rule + '&nbsp;--&nbsp;' + '<b>' +props.rules[i].ans + '</b><br/><br/>';
+						}
+					} else {
+						this._div.innerHTML = '<b>click on a country to explore rules</b>'
+					} 
+					
+				};
+				rightInfo.addTo(mapi);
+				
+				//put the right menu right to the map
+				var htmlObject = rightInfo.getContainer();
+				var a = document.getElementById('info_menu');
+				
+				function setParent(el, info_menu){
+					info_menu.appendChild(el);
+				}
+				setParent(htmlObject,a);
+			}
+</script>
+		
+	</body>
+</html>
